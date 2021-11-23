@@ -45,6 +45,10 @@ export default function SignIn(){
         event.preventDefault();
       };
 
+    function signUpButtonHandler(email, password){
+
+    };
+
     return (
         <div className="paper_body">
         <video autoPlay loop muted>
@@ -58,6 +62,7 @@ export default function SignIn(){
                                 E-mail
                             </InputLabel>
                             <Input
+                                id="email"
                                 name="email"            
                                 type="email"
                                 autoComplete="email"
@@ -92,9 +97,10 @@ export default function SignIn(){
                                 setOpen(true)
                                 setEmail('')
                                 setPassword('')
-                                if(email !== "" && password !== "")
-                                    window.location.href = 'profile'
-
+                                if(email !== "" && password !== ""){
+                                    window.location.href = 'profile';
+                                    signUpButtonHandler(email, password);
+                                }
                             }} redirect="/sign-in" buttonStyle='btn--outline'> LOGIN</Button>}
                             {loading && <Box sx={{ display: 'flex' }}>
                             </Box>
