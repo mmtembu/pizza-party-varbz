@@ -9,8 +9,11 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
+// import { IPFS } from 'ipfs/src';
 // import Snackbar from '@mui/material/Snackbar';
 // import MuiAlert from '@mui/material/Alert';
+// import IPFS from 'ipfs'
+// import OrbitDB from 'orbit-db';
 
 
 
@@ -36,8 +39,47 @@ export default function SignUpFormCreator(){
     const [loading, setLoading] = useState(false);
     const [seconds, setSeconds] = useState(10);
     const [open, setOpen] = useState(false);
+    const [passwordMatch, setPasswordMatch] = useState(false);
+    const [buttonState, setButtonState] = useState(true);
+    const IPFS = require('ipfs')
+    const OrbitDB = require('orbit-db');
+    var orbitdb = null
+
     
+    useEffect( async()=>{
+        try{
+            const ipfsOptions = {repo: './ipfs',};
+            const ipfs = await IPFS.create(ipfsOptions);
+            
+            orbitdb = await OrbitDB.createInstance(ipfs);
+            const db = await orbitdb.keyvalue('first-database');
+            console.log(db.address);
+            
+            }catch(exc){
+                console.log(`This is the error continue with the program executionL ${exc}`);
+            }
+    })
+
+    const dbConnection= async()=> {
+
+        const db1 = await orbitdb.keyvalue('first-database')
+        await db1.put('')
+        
+        // try{
+        // const ipfsOptions = {repo: './ipfs',};
+        // const ipfs = await IPFS.create(ipfsOptions);
+        
+        // const orbitdb = await OrbitDB.createInstance(ipfs);
+        // const db = await orbitdb.keyvalue('first-database');
+        // console.log(db.address);
+        
+        // }catch(exc){
+        //     console.log(`This is the error continue with the program executionL ${exc}`);
+        // }
+    }
+
     function handleChange(value, event){
+
         if(value === "email")
             setEmail(event.target.value);
         else if(value === "password"){
@@ -49,10 +91,24 @@ export default function SignUpFormCreator(){
         }else if(value === "surname"){
             setSurname(event.target.value)
         }
+        setButtonState(
+            name.length < 0 &&
+            surname.length < 0 &&
+            email.length < 0 &&
+            password.length < 0 &&
+            confirmPassword.length < 0
+        );
+        
     }
     const handleClickShowPassword =()=> setShowPassword(!showPassword);
 
     const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+      };
+
+    const handleClickShowConfirmPassword =()=> setShowConfirmPassword(!showConfirmPassword);
+
+    const handleMouseDownConfirmPassword = (event) => {
         event.preventDefault();
       };
       useEffect(() => {
@@ -75,6 +131,7 @@ export default function SignUpFormCreator(){
                                 Name
                             </InputLabel>
                             <Input
+                                id="name"
                                 name="name"
                                 type="name"
                                 autoComplete="name"
@@ -88,6 +145,7 @@ export default function SignUpFormCreator(){
                                 Surname
                             </InputLabel>
                             <Input
+                                id="name"
                                 name="surname"
                                 type="Surname"
                                 autoComplete="Surname"
@@ -101,7 +159,8 @@ export default function SignUpFormCreator(){
                                 E-mail
                             </InputLabel>
                             <Input
-                                name="email"            
+                                id="email"
+                                name="email"
                                 type="email"
                                 autoComplete="email"
                                 // className={classes.inputs}
@@ -140,8 +199,8 @@ export default function SignUpFormCreator(){
                                 <InputAdornment position="end">
                                     <IconButton
                                         aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
+                                        onClick={handleClickShowConfirmPassword}
+                                        onMouseDown={handleMouseDownConfirmPassword}
                                         edge="end">
                                     {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
@@ -150,7 +209,8 @@ export default function SignUpFormCreator(){
                                 label="Confirm Password"/>
                         </FormControl>
                         <FormControl className="buttonControl">
-                            {Button && <Button onClick={function(e){
+                            {Button && <Button disabled={buttonState} onClick={function(e){
+                                                        console.log(confirmPassword.length)
                                 setLoading(true)
                                 setOpen(true)
                                 setEmail('')
@@ -158,7 +218,8 @@ export default function SignUpFormCreator(){
                                 setSurname('')
                                 setPassword('')
                                 setConfirmPassword('')
-                                window.location.reload(true)
+                                dbConnection();
+                                // window.location.reload(true)
                             }} redirect="/sign-up-form-creator" buttonStyle='btn--outline'> REGISTER</Button>}
                             {loading && <Box sx={{ display: 'flex' }}>
                             </Box>
